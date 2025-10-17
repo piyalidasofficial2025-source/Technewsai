@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Explore India — Holy Places & Hotels</title>
+<meta name="description" content="Directory of famous Indian holy places and nearby hotels with photos, addresses, phones and short history."/>
+<style>
+  :root{--accent:#d35400;--muted:#666;--bg:#f8fafc}
+  *{box-sizing:border-box}
+  body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; margin:0; color:#222; background:var(--bg); line-height:1.45}
+  .wrap{max-width:1150px;margin:0 auto;padding:18px}
+  header{position:relative}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0}
+  .brand{display:flex;gap:12px;align-items:center}
+  .brand h1{font-size:20px;margin:0}
+  .lang-switch{display:flex;gap:6px;align-items:center}
+  .lang-btn{background:#fff;border:1px solid #ddd;padding:6px 8px;border-radius:6px;cursor:pointer}
+  /* slideshow */
+  .hero{position:relative;border-radius:12px;overflow:hidden;margin-bottom:12px}
+  .slides{position:relative;height:380px}
+  .slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity .9s ease}
+  .slide.active{opacity:1}
+  .slide .cap{position:absolute;left:22px;bottom:28px;background:rgba(0,0,0,0.45);color:#fff;padding:14px;border-radius:8px}
+  /* search */
+  .search-row{display:flex;gap:8px;margin:14px 0}
+  .search-row input, .search-row select{flex:1;padding:12px;border-radius:8px;border:1px solid #ddd;background:#fff}
+  .btn{background:var(--accent);color:white;padding:10px 14px;border-radius:8px;border:none;cursor:pointer}
+  /* layout */
+  nav.tabs{display:flex;gap:8px;margin:12px 0}
+  nav.tabs button{background:#fff;border:1px solid #ddd;padding:8px 10px;border-radius:8px;cursor:pointer}
+  .grid{display:grid;grid-template-columns:repeat(1,1fr);gap:14px}
+  @media(min-width:700px){.grid{grid-template-columns:repeat(2,1fr)}}
+  @media(min-width:1000px){.grid{grid-template-columns:repeat(3,1fr)}}
+  .card{background:#fff;border-radius:12px;overflow:hidden;border:1px solid #eee;box-shadow:0 6px 18px rgba(10,10,10,.04)}
+  .card img{width:100%;height:180px;object-fit:cover;display:block}
+  .card .card-body{padding:12px}
+  .card h3{margin:0 0 6px 0;font-size:16px}
+  .muted{color:var(--muted);font-size:13px}
+  .phone{font-weight:600;margin-top:8px}
+  .history{font-size:14px;margin-top:10px;color:#333}
+  /* modal */
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:20px;z-index:9999}
+  .modal{background:white;border-radius:10px;max-width:900px;width:100%;overflow:auto;max-height:90vh}
+  .modal .modal-img{height:360px;background-size:cover;background-position:center;border-top-left-radius:10px;border-top-right-radius:10px}
+  .modal .modal-body{padding:16px}
+  /* gallery */
+  .gallery-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  @media(min-width:900px){.gallery-grid{grid-template-columns:repeat(4,1fr)}}
+  .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;padding:18px;z-index:10000}
+  .lightbox img{max-width:95%;max-height:90%}
+  /* footer */
+  footer{padding:28px 18px;text-align:center;color:#777;border-top:1px solid #eee;margin-top:28px;background:transparent}
+  .footer-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:space-between;align-items:center}
+  .socials{display:flex;gap:8px}
+  .mute-btn{position:fixed;right:18px;bottom:18px;background:#fff;border-radius:999px;padding:10px;border:1px solid #ddd;box-shadow:0 6px 18px rgba(10,10,10,.06);cursor:pointer}
+  .state-filter{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .pill{background:#fff;padding:6px 10px;border-radius:999px;border:1px solid #eee;cursor:pointer}
+  .hidden{display:none}
+  code{background:#f3f4f6;padding:6px;border-radius:6px}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="topbar">
+        <div class="brand">
+          <img src="https://images.unsplash.com/photo-1544045313-9f64a9f7b1a9?q=80&w=80&auto=format&fit=crop" alt="logo" style="height:44px;border-radius:8px">
+          <div>
+            <h1 id="siteTitle">Explore India — Holy Places & Hotels</h1>
+            <div class="muted" id="siteTag">Directory of famous Indian holy places & nearby hotels</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="lang-switch" aria-hidden>
+            <button class="lang-btn" onclick="setLang('en')">EN</button>
+            <button class="lang-btn" onclick="setLang('hi')">हिंदी</button>
+            <button class="lang-btn" onclick="setLang('ta')">தமிழ்</button>
+          </div>
+          <button class="btn" onclick="scrollToTop()">Top</button>
+        </div>
+      </div>
+
+      <!-- hero slideshow -->
+      <section class="hero" aria-hidden>
+        <div class="slides" id="slides">
+          <!-- slides will be injected by JS -->
+        </div>
+      </section>
+    </header>
+
+    <!-- search / tabs -->
+    <div>
+      <div class="search-row">
+        <input id="q" placeholder="Type a city, temple, or hotel (e.g. Varanasi, Golden Temple)" />
+        <select id="filter">
+          <option value="all">All</option>
+          <option value="holy">Holy Places</option>
+          <option value="hotel">Hotels</option>
+        </select>
+        <button class="btn" onclick="applyFilter()">Search</button>
+      </div>
+
+      <nav class="tabs" style="margin-bottom:8px">
+        <button onclick="showSection('holy')">Holy Places</button>
+        <button onclick="showSection('hotels')">Hotels</button>
+        <button onclick="showSection('galleryPage')">Gallery</button>
+      </nav>
+    </div>
+
+    <!-- HOLY PLACES -->
+    <section id="holy" class="section">
+      <h2 id="holyTitle">Holy Places</h2>
+      <div class="grid" id="holyGrid"></div>
+    </section>
+
+    <!-- HOTELS -->
+    <section id="hotels" class="section hidden" style="margin-top:18px">
+      <h2 id="hotelsTitle">Nearby Hotels</h2>
+      <div class="grid" id="hotelGrid"></div>
+    </section>
+
+    <!-- GALLERY PAGE -->
+    <section id="galleryPage" class="section hidden" style="margin-top:18px">
+      <h2 id="galleryTitle">Gallery</h2>
+      <div class="muted" id="galleryDesc">Filter by state to view images</div>
+      <div class="state-filter" id="stateFilter"></div>
+      <div class="gallery-grid" id="galleryGrid" style="margin-top:12px"></div>
+    </section>
+
+    <!-- MAP placeholder / instructions -->
+    <section id="map" class="section hidden" style="margin-top:18px">
+      <h2>Map & Directions</h2>
+      <p class="muted">Click "Open on Map" on any place to view exact location in Google Maps.</p>
+      <div style="border-radius:12px;overflow:hidden;margin-top:12px;">
+        <!-- Static India map iframe as fallback -->
+        <iframe title="India map" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d18275802.123456!2d75.0!3d22.0!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDEyJzQ5LjAiTiA3NcKwMDAnMDIuMCJF!5e0!3m2!1sen!2sin!4v1600000000000" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- modal for place -->
+  <div id="modalBg" class="modal-bg" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div id="modalImg" class="modal-img"></div>
+      <div class="modal-body">
+        <h3 id="modalTitle"></h3>
+        <div id="modalAddress" class="muted"></div>
+        <div id="modalPhone" class="phone"></div>
+        <div id="modalHistory" class="history"></div>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button class="btn" onclick="closeModal()">Close</button>
+          <a id="openOnMap" class="btn" target="_blank" rel="noopener noreferrer">Open on Map</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- lightbox -->
+  <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+    <img id="lightboxImg" src="" alt="">
+  </div>
+
+  <!-- mute/unmute audio -->
+  <button id="muteBtn" class="mute-btn" title="Unmute / Mute">
+    🔈 Unmute
+  </button>
+
+  <footer>
+    <div class="wrap">
+      <div class="footer-row">
+        <div>
+          <strong id="aboutTitle">About Incredible India</strong>
+          <div class="muted" id="aboutText">A curated directory of spiritual places and nearby stays across India.</div>
+        </div>
+        <div>
+          <div>Contact: <a href="mailto:info@example.com">info@example.com</a> | Phone: +91 98765 43210</div>
+          <div class="socials" style="margin-top:8px">
+            <a href="#" title="Facebook">🔵 Facebook</a>
+            <a href="#" title="Instagram">📸 Instagram</a>
+            <a href="#" title="YouTube">▶️ YouTube</a>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px" class="muted">Made with ❤️ — Copy/host this single file (index.html) to publish.</div>
+    </div>
+  </footer>
+
+<!-- -- DATA & SCRIPTS -- -->
+<script>
+/* -------------------------
+   TRANSLATIONS (EN / HI / TA)
+   ------------------------- */
+const TEXT = {
+  en: {
+    siteTitle: "Explore India — Holy Places & Hotels",
+    siteTag: "Directory of famous Indian holy places & nearby hotels",
+    holyTitle: "Holy Places",
+    hotelsTitle: "Nearby Hotels",
+    galleryTitle: "Gallery",
+    galleryDesc: "Filter by state to view images",
+    aboutTitle: "About Incredible India",
+    aboutText: "A curated directory of spiritual places and nearby stays across India."
+  },
+  hi: {
+    siteTitle: "भारत की खोज — पवित्र स्थल और होटल",
+    siteTag: "प्रसिद्ध भारतीय पवित्र स्थलों और निकटतम होटलों की सूची",
+    holyTitle: "पवित्र स्थल",
+    hotelsTitle: "नज़दीकी होटल",
+    galleryTitle: "गैलरी",
+    galleryDesc: "राज्य के अनुसार फ़िल्टर करें",
+    aboutTitle: "इंक्रेडिबल इंडिया के बारे में",
+    aboutText: "भारत भर में आध्यात्मिक स्थलों और आवासों की चुनी हुई सूची।"
+  },
+  ta: {
+    siteTitle: "இந்தியாவை ஆராயுங்கள் — புனித இடங்கள் & ஹோட்டல்கள்",
+    siteTag: "பிரபல இந்திய புனித ச ځایங்கள் மற்றும் அருகிலுள்ள ஹோட்டల்களின் பட்டியல்",
+    holyTitle: "புனித இடங்கள்",
+    hotelsTitle: "அருகிலுள்ள ஹோட்டல்கள்",
+    galleryTitle: "புகைப்படங்கள்",
+    galleryDesc: "மாநிலத்தின்படி வடிகட்டவும்",
+    aboutTitle: "அம்சங்கள் — Incredible India",
+    aboutText: "இந்தியாவின் ஆன்மீக இடங்கள் மற்றும் வசிப்பிடம் பட்டியல்."
+  }
+};
+
+let CURRENT_LANG = 'en';
+function setLang(l){
+  CURRENT_LANG = l;
+  const t = TEXT[l];
+  document.getElementById('siteTitle').innerText = t.siteTitle;
+  document.getElementById('siteTag').innerText = t.siteTag;
+  document.getElementById('holyTitle').innerText = t.holyTitle;
+  document.getElementById('hotelsTitle').innerText = t.hotelsTitle;
+  document.getElementById('galleryTitle').innerText = t.galleryTitle;
+  document.getElementById('galleryDesc').innerText = t.galleryDesc;
+  document.getElementById('aboutTitle').innerText = t.aboutTitle;
+  document.getElementById('aboutText').innerText = t.aboutText;
+}
+
+/* -------------------------
+   IMAGES FOR SLIDESHOW
+   ------------------------- */
+const SLIDES = [
+  {img:'https://images.unsplash.com/photo-1505765050741-5aa2c7ad7f8e?q=80&w=2000&auto=format&fit=crop', caption:'Majestic Taj Mahal — Agra'},
+  {img:'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=2000&auto=format&fit=crop', caption:'Divine Varanasi Ghats'},
+  {img:'https://images.unsplash.com/photo-1526481280698-2b6b7f2d8b65?q=80&w=2000&auto=format&fit=crop', caption:'Golden Temple — Amritsar'},
+  {img:'https://images.unsplash.com/photo-1509395176047-4a66953fd231?q=80&w=2000&auto=format&fit=crop', caption:'Rishikesh — Ganga Aarti'},
+  {img:'https://images.unsplash.com/photo-1560343090-f0409e92791a?q=80&w=2000&auto=format&fit=crop', caption:'Meenakshi Temple — Madurai'}
+];
+
+function buildSlides(){
+  const el = document.getElementById('slides');
+  SLIDES.forEach((s,i)=>{
+    const d = document.createElement('div');
+    d.className = 'slide' + (i===0? ' active':'');
+    d.style.backgroundImage = `url('${s.img}')`;
+    d.innerHTML = `<div class="cap"><strong>${s.caption}</strong></div>`;
+    el.appendChild(d);
+  });
+}
+let slideIndex = 0;
+function startSlideshow(){
+  const items = document.querySelectorAll('.slide');
+  if(!items.length) return;
+  setInterval(()=> {
+    items[slideIndex].classList.remove('active');
+    slideIndex = (slideIndex+1)%items.length;
+    items[slideIndex].classList.add('active');
+  }, 4500);
+}
+
+/* -------------------------
+   SAMPLE DATA (35 places + hotels)
+   ------------------------- */
+const holyPlaces = [
+  {id:'taj',title:'Taj Mahal',city:'Agra, Uttar Pradesh',state:'Uttar Pradesh',phone:'+91 562 222 3333',img:'https://images.unsplash.com/photo-1505765050741-5aa2c7ad7f8e?q=80&w=1600&auto=format&fit=crop',history:'Built by Shah Jahan in memory of Mumtaz Mahal (1653). UNESCO World Heritage Site.'},
+  {id:'golden',title:'Harmandir Sahib (Golden Temple)',city:'Amritsar, Punjab',state:'Punjab',phone:'+91 183 255 4444',img:'https://images.unsplash.com/photo-1526481280698-2b6b7f2d8b65?q=80&w=1600&auto=format&fit=crop',history:'The holiest Gurdwara of Sikhism.'},
+  {id:'kashi',title:'Kashi Vishwanath Temple',city:'Varanasi, Uttar Pradesh',state:'Uttar Pradesh',phone:'+91 542 250 7777',img:'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=1600&auto=format&fit=crop',history:'Ancient Shiva temple on the banks of the Ganga.'},
+  {id:'vaishno',title:'Vaishno Devi',city:'Katra, Jammu & Kashmir',state:'Jammu & Kashmir',phone:'+91 196 522 3333',img:'https://images.unsplash.com/photo-1549893074-6b65d5d3d9e0?q=80&w=1600&auto=format&fit=crop',history:'Pilgrimage cave shrine dedicated to Goddess Vaishno Devi.'},
+  {id:'meenakshi',title:'Meenakshi Amman Temple',city:'Madurai, Tamil Nadu',state:'Tamil Nadu',phone:'+91 452 234 8888',img:'https://images.unsplash.com/photo-1560343090-f0409e92791a?q=80&w=1600&auto=format&fit=crop',history:'Famous for its towering gopurams.'},
+  {id:'tirupati',title:'Tirumala Venkateswara Temple',city:'Tirupati, Andhra Pradesh',state:'Andhra Pradesh',phone:'+91 877 224 4444',img:'https://images.unsplash.com/photo-1534105571571-182e9a0b8d32?q=80&w=1600&auto=format&fit=crop',history:'One of the richest and most visited Hindu temples.'},
+  {id:'rameshwaram',title:'Ramanathaswamy Temple',city:'Rameswaram, Tamil Nadu',state:'Tamil Nadu',phone:'+91 4564 233 111',img:'https://images.unsplash.com/photo-1544033527-1bcf15a7c6b0?q=80&w=1600&auto=format&fit=crop',history:'Ancient temple with long corridors.'},
+  {id:'somnath',title:'Somnath Temple',city:'Prabhas Patan, Gujarat',state:'Gujarat',phone:'+91 2876 252 222',img:'https://images.unsplash.com/photo-1543474366-6d7f3a9f0a7b?q=80&w=1600&auto=format&fit=crop',history:'Legendary Jyotirlinga temple on the Arabian Sea coast.'},
+  {id:'kedarnath',title:'Kedarnath Temple',city:'Kedarnath, Uttarakhand',state:'Uttarakhand',phone:'+91 1364 253 333',img:'https://images.unsplash.com/photo-1487730116645-74489c95b41b?q=80&w=1600&auto=format&fit=crop',history:'Ancient Himalayan shrine dedicated to Lord Shiva.'},
+  {id:'badrinath',title:'Badrinath Temple',city:'Badrinath, Uttarakhand',state:'Uttarakhand',phone:'+91 1365 252 444',img:'https://images.unsplash.com/photo-1505763672700-6d39c4c0b552?q=80&w=1600&auto=format&fit=crop',history:'Important Vaishnava pilgrimage site.'},
+  {id:'amarnath',title:'Amarnath Cave',city:'Pahalgam/Amarnath, Jammu & Kashmir',state:'Jammu & Kashmir',phone:'+91 9419 111222',img:'https://images.unsplash.com/photo-1505678261036-a3fcc5e884ee?q=80&w=1600&auto=format&fit=crop',history:'Ice-lingam cave shrine visited during annual yatra.'},
+  {id:'guruvayur',title:'Guruvayur Temple',city:'Guruvayur, Kerala',state:'Kerala',phone:'+91 494 254 333',img:'https://images.unsplash.com/photo-1521719966376-3b3d1a3b2f79?q=80&w=1600&auto=format&fit=crop',history:'Famous Krishna temple.'},
+  {id:'mathura',title:'Krishna Janmabhoomi',city:'Mathura, Uttar Pradesh',state:'Uttar Pradesh',phone:'+91 562 255 6666',img:'https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1600&auto=format&fit=crop',history:'Birthplace of Lord Krishna.'},
+  {id:'vrindavan',title:'Banke Bihari Temple',city:'Vrindavan, Uttar Pradesh',state:'Uttar Pradesh',phone:'+91 567 222 777',img:'https://images.unsplash.com/photo-1523829150473-0d2f6b2b9d8b?q=80&w=1600&auto=format&fit=crop',history:'Popular temple dedicated to Krishna.'},
+  {id:'sabarimala',title:'Sabarimala Temple',city:'Pathanamthitta, Kerala',state:'Kerala',phone:'+91 469 255 888',img:'https://images.unsplash.com/photo-1509078661335-9d3a1e2d3d6f?q=80&w=1600&auto=format&fit=crop',history:'Pilgrimage shrine dedicated to Lord Ayyappa.'},
+  {id:'shirdi',title:'Saibaba Samadhi Mandir',city:'Shirdi, Maharashtra',state:'Maharashtra',phone:'+91 2453 252 222',img:'https://images.unsplash.com/photo-1519664824561-0a1a7b9aaf8b?q=80&w=1600&auto=format&fit=crop',history:'Temple complex dedicated to Sai Baba.'},
+  {id:'dargah',title:'Ajmer Sharif Dargah',city:'Ajmer, Rajasthan',state:'Rajasthan',phone:'+91 145 264 3333',img:'https://images.unsplash.com/photo-1532465616-7e4a0f5c7c3d?q=80&w=1600&auto=format&fit=crop',history:'Sufi shrine of Khwaja Moinuddin Chishti.'},
+  {id:'almora',title:'Jageshwar Temples',city:'Almora, Uttarakhand',state:'Uttarakhand',phone:'+91 5942 252 111',img:'https://images.unsplash.com/photo-1482192596544-9eb780fc7f66?q=80&w=1600&auto=format&fit=crop',history:'Ancient group of Himalayan temples.'},
+  {id:'konark',title:'Konark Sun Temple',city:'Konark, Odisha',state:'Odisha',phone:'+91 675 252 777',img:'https://images.unsplash.com/photo-1505765050741-5aa2c7ad7f8e?q=80&w=1600&auto=format&fit=crop',history:'13th-century temple built as a chariot of the Sun God.'},
+  {id:'jaisalmer',title:'Jain Temples, Jaisalmer',city:'Jaisalmer, Rajasthan',state:'Rajasthan',phone:'+91 2992 252 111',img:'https://images.unsplash.com/photo-1508264165352-258a6a55b4b9?q=80&w=1600&auto=format&fit=crop',history:'Intricately carved Jain temples.'},
+  {id:'someshwar',title:'Someshwara Temple',city:'Udupi, Karnataka',state:'Karnataka',phone:'+91 825 252 444',img:'https://images.unsplash.com/photo-1505765050741-5aa2c7ad7f8e?q=80&w=1600&auto=format&fit=crop',history:'Historic coastal temple.'},
+  {id:'uttarkashi',title:'Gangotri Temple',city:'Uttarkashi, Uttarakhand',state:'Uttarakhand',phone:'+91 1374 252 333',img:'https://images.unsplash.com/photo-1482192596544-9eb780fc7f66?q=80&w=1600&auto=format&fit=crop',history:'Source of the holy river Ganga.'},
+  {id:'mahakal',title:'Mahakaleshwar Jyotirlinga',city:'Ujjain, Madhya Pradesh',state:'Madhya Pradesh',phone:'+91 734 252 555',img:'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=1600&auto=format&fit=crop',history:'One of the twelve Jyotirlinga shrines.'},
+  {id:'ajanta',title:'Ajanta Caves',city:'Aurangabad, Maharashtra',state:'Maharashtra',phone:'+91 240 252 222',img:'https://images.unsplash.com/photo-1505765050741-5aa2c7ad7f8e?q=80&w=1600&auto=format&fit=crop',history:'Ancient Buddhist cave monuments.'},
+  {id:'bodh',title:'Mahabodhi Temple',city:'Bodh Gaya, Bihar',state:'Bihar',phone:'+91 631 252 333',img:'https://images.unsplash.com/photo-1534105571571-182e9a0b8d32?q=80&w=1600&auto=format&fit=crop',history:'Site of Buddha’s enlightenment.'},
+  {id:'amaravati',title:'Dhyana Buddha',city:'Amaravati, Andhra Pradesh',state:'Andhra Pradesh',phone:'+91 866 252 444',img:'https://images.unsplash.com/photo-1509395176047-4a66953fd231?q=80&w=1600&auto=format&fit=crop',history:'Large Buddha statue and meditation complex.'},
+  {id:'lalbaug',title:'Haji Ali Dargah',city:'Mumbai, Maharashtra',state:'Maharashtra',phone:'+91 22 252 5555',img:'https://images.unsplash.com/photo-1501117716987-c8e9f3d5b4af?q=80&w=1600&auto=format&fit=crop',history:'Famous dargah located on an islet off Mumbai coast.'},
+  {id:'puri',title:'Jagannath Temple',city:'Puri, Odisha',state:'Odisha',phone:'+91 674 252 666',img:'https://images.unsplash.com/photo-1549893074-6b65d5d3d9e0?q=80&w=1600&auto=format&fit=crop',history:'Major pilgrimage site and Rath Yatra center.'},
+  {id:'palitana',title:'Palitana Temples',city:'Palitana, Gujarat',state:'Gujarat',phone:'+91 2786 252 777',img:'https://images.unsplash.com/photo-1523829150473-0d2f6b2b9d8b?q=80&w=1600&auto=format&fit=crop',history:'Over 900 Jain temples on Shatrunjaya hill.'},
+  {id:'hampi',title:'Virupaksha Temple',city:'Hampi, Karnataka',state:'Karnataka',phone:'+91 8366 252 111',img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1600&auto=format&fit=crop',history:'Ancient temple among the ruins of Vijayanagara.'}
+];
+
+const hotels = [
+  {id:'agra1',title:'The Oberoi Amarvilas',city:'Agra, near Taj Mahal',state:'Uttar Pradesh',phone:'+91 562 406 3333',img:'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1600&auto=format&fit=crop',notes:'Luxury hotel with direct views of Taj.'},
+  {id:'amritsar1',title:'Taj Swarna, Amritsar',city:'Amritsar, near Golden Temple',state:'Punjab',phone:'+91 183 250 2000',img:'https://images.unsplash.com/photo-1501117716987-c8e9f3d5b4af?q=80&w=1600&auto=format&fit=crop',notes:'Upscale hotel.'},
+  {id:'varanasi1',title:'BrijRama Palace',city:'Varanasi, near Ganga',state:'Uttar Pradesh',phone:'+91 542 250 7777',img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1600&auto=format&fit=crop',notes:'Heritage hotel with rooftop Ganga views.'},
+  {id:'katra1',title:'Regenta Inn',city:'Katra, base for Vaishno Devi',state:'Jammu & Kashmir',phone:'+91 196 522 8888',img:'https://images.unsplash.com/photo-1542314831-0a1b2c3d4e?q=80&w=1600&auto=format&fit=crop',notes:'Comfortable stay.'},
+  {id:'madurai1',title:'Heritage Madurai',city:'Madurai, near Meenakshi Temple',state:'Tamil Nadu',phone:'+91 452 234 9999',img:'https://images.unsplash.com/photo-1542317854-1e0f2c08b0b6?q=80&w=1600&auto=format&fit=crop',notes:'Traditional hospitality.'},
+  {id:'tirupati1',title:'Fortune Select Grand Ridge',city:'Tirupati',state:'Andhra Pradesh',phone:'+91 877 222 3333',img:'https://images.unsplash.com/photo-1534105571571-182e9a0b8d32?q=80&w=1600&auto=format&fit=crop',notes:'Modern hotel.'},
+  {id:'ramesh1',title:'The Gateway Hotel',city:'Rameswaram',state:'Tamil Nadu',phone:'+91 4564 222 333',img:'https://images.unsplash.com/photo-1544033527-1bcf15a7c6b0?q=80&w=1600&auto=format&fit=crop',notes:'Seafront rooms.'},
+  {id:'somnath1',title:'The Fern Residency',city:'Somnath',state:'Gujarat',phone:'+91 2876 222 444',img:'https://images.unsplash.com/photo-1543474366-6d7f3a9f0a7b?q=80&w=1600&auto=format&fit=crop',notes:'Coastal hotel.'},
+  {id:'kedarnath1',title:'GMVN Tourist Rest House',city:'Kedarnath',state:'Uttarakhand',phone:'+91 1364 252 777',img:'https://images.unsplash.com/photo-1487730116645-74489c95b41b?q=80&w=1600&auto=format&fit=crop',notes:'Basic accommodation.'},
+  {id:'badrinath1',title:'Nanda Ghunti',city:'Badrinath',state:'Uttarakhand',phone:'+91 1365 252 888',img:'https://images.unsplash.com/photo-1505763672700-6d39c4c0b552?q=80&w=1600&auto=format&fit=crop',notes:'Guesthouse.'},
+  {id:'guruvayur1',title:'Guruvayur Residency',city:'Guruvayur',state:'Kerala',phone:'+91 494 254 777',img:'https://images.unsplash.com/photo-1521719966376-3b3d1a3b2f79?q=80&w=1600&auto=format&fit=crop',notes:'Comfortable stay near temple.'},
+  {id:'mathura1',title:'Hotel Hari Piorko',city:'Mathura',state:'Uttar Pradesh',phone:'+91 562 222 444',img:'https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1600&auto=format&fit=crop',notes:'Budget-friendly hotel.'},
+  {id:'bihar1',title:'Bodh Vatika',city:'Bodh Gaya',state:'Bihar',phone:'+91 631 252 999',img:'https://images.unsplash.com/photo-1534105571571-182e9a0b8d32?q=80&w=1600&auto=format&fit=crop',notes:'Guesthouse for pilgrims.'},
+  {id:'mumbai1',title:'Hotel Marine Plaza',city:'Mumbai, near Haji Ali',state:'Maharashtra',phone:'+91 22 252 3333',img:'https://images.unsplash.com/photo-1501117716987-1b2c3d4e5f?q=80&w=1600&auto=format&fit=crop',notes:'Sea-facing rooms.'},
+  {id:'puri1',title:'Mayfair Heritage',city:'Puri',state:'Odisha',phone:'+91 674 252 111',img:'https://images.unsplash.com/photo-1549893074-6b65d5d3d9e0?q=80&w=1600&auto=format&fit=crop',notes:'Resort style rooms.'},
+  {id:'palitana1',title:'Palace Hotel',city:'Palitana',state:'Gujarat',phone:'+91 2786 252 111',img:'https://images.unsplash.com/photo-1523829150473-0d2f6b2b9d8b?q=80&w=1600&auto=format&fit=crop',notes:'Simple stay.'},
+  {id:'hampi1',title:'Hampi Heritage Resort',city:'Hampi',state:'Karnataka',phone:'+91 8366 252 999',img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1600&auto=format&fit=crop',notes:'Relaxed stay near ruins.'}
+];
+
+/* fallback image */
+const NO_IMAGE = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500"><rect width="100%" height="100%" fill="%23f3f4f6"/><text x="50%" y="50%" font-size="24" fill="%23666" text-anchor="middle" alignment-baseline="middle">No Image</text></svg>';
+
+/* -------------------------
+   RENDERING FUNCTIONS
+   ------------------------- */
+function createImg(src, alt){
+  const img = document.createElement('img');
+  img.alt = alt || '';
+  img.loading = 'lazy';
+  img.src = src || NO_IMAGE;
+  img.onerror = ()=>{ img.src = NO_IMAGE; };
+  return img;
+}
+
+function makeCard(item,type){
+  const div = document.createElement('div');
+  div.className = 'card';
+  const img = createImg(item.img, item.title);
+  const body = document.createElement('div');
+  body.className = 'card-body';
+  body.innerHTML = `
+    <h3>${item.title}</h3>
+    <div class="muted">${item.city}</div>
+    <div class="phone">${item.phone || 'N/A'}</div>
+    <div class="history">${(item.history||item.notes||'—').slice(0,160)}${(item.history && item.history.length>160)?'...':''}</div>
+    <div style="margin-top:10px;display:flex;gap:8px">
+      <button class="btn" onclick="openModal('${type}','${item.id}')">View</button>
+      <a class="pill" href="https://www.google.com/search?q=${encodeURIComponent(item.title+' '+item.city)}" target="_blank" rel="noopener">Search</a>
+    </div>
+  `;
+  div.appendChild(img);
+  div.appendChild(body);
+  return div;
+}
+
+function populateAll(){
+  const holyGrid = document.getElementById('holyGrid');
+  const hotelGrid = document.getElementById('hotelGrid');
+  holyGrid.innerHTML = '';
+  hotelGrid.innerHTML = '';
+  holyPlaces.forEach(h => holyGrid.appendChild(makeCard(h, 'holy')));
+  hotels.forEach(h => hotelGrid.appendChild(makeCard(h, 'hotel')));
+}
+
+/* modal open */
+function openModal(type,id){
+  const list = type==='holy'? holyPlaces : hotels;
+  const item = list.find(x=>x.id===id);
+  if(!item) return;
+  document.getElementById('modalImg').style.backgroundImage = `url('${item.img || ''}')`;
+  document.getElementById('modalTitle').innerText = item.title;
+  document.getElementById('modalAddress').innerText = item.city;
+  document.getElementById('modalPhone').innerText = item.phone || 'Contact not available';
+  document.getElementById('modalHistory').innerText = item.history || item.notes || 'No details available.';
+  document.getElementById('openOnMap').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.title + ' ' + item.city)}`;
+  document.getElementById('modalBg').style.display = 'flex';
+}
+function closeModal(e){
+  document.getElementById('modalBg').style.display = 'none';
+}
+
+/* show/hide sections */
+function showSection(id){
+  ['holy','hotels','galleryPage','map'].forEach(s=> {
+    const el = document.getElementById(s);
+    if(el) el.classList.toggle('hidden', s!==id);
+  });
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* apply filter search */
+function applyFilter(){
+  const q = (document.getElementById('q').value || '').trim().toLowerCase();
+  const f = document.getElementById('filter').value;
+  const holyGrid = document.getElementById('holyGrid');
+  const hotelGrid = document.getElementById('hotelGrid');
+  holyGrid.innerHTML = '';
+  hotelGrid.innerHTML = '';
+  const holyFiltered = holyPlaces.filter(item=>{
+    if(f==='hotel') return false;
+    return (item.title + ' ' + item.city + ' ' + (item.history||'')).toLowerCase().includes(q);
+  });
+  const hotelFiltered = hotels.filter(item=>{
+    if(f==='holy') return false;
+    return (item.title + ' ' + item.city + ' ' + (item.notes||'')).toLowerCase().includes(q);
+  });
+  if(holyFiltered.length) holyFiltered.forEach(h=> holyGrid.appendChild(makeCard(h,'holy')));
+  if(hotelFiltered.length) hotelFiltered.forEach(h=> hotelGrid.appendChild(makeCard(h,'hotel')));
+  // show appropriate tab
+  if(holyFiltered.length && !hotelFiltered.length) showSection('holy');
+  else if(hotelFiltered.length && !holyFiltered.length) showSection('hotels');
+  else showSection('holy');
+  if(!holyFiltered.length && !hotelFiltered.length){
+    holyGrid.innerHTML = '<div class="card" style="padding:18px"><div class="card-body"><div class="muted">No results found.</div></div></div>';
+  }
+}
+
+/* -------------------------
+   GALLERY & STATE FILTER
+   ------------------------- */
+function buildGallery(){
+  const states = Array.from(new Set(holyPlaces.map(h => h.state).concat(hotels.map(h=>h.state)).filter(Boolean))).sort();
+  const stateFilter = document.getElementById('stateFilter');
+  stateFilter.innerHTML = '<div class="pill" onclick="renderGallery(null)">All</div>';
+  states.forEach(s => {
+    const btn = document.createElement('div');
+    btn.className = 'pill';
+    btn.innerText = s;
+    btn.onclick = ()=> renderGallery(s);
+    stateFilter.appendChild(btn);
+  });
+  // default render
+  renderGallery(null);
+}
+function renderGallery(state){
+  const grid = document.getElementById('galleryGrid');
+  grid.innerHTML = '';
+  const items = [];
+  holyPlaces.forEach(h => { if(!state || h.state===state) items.push({img:h.img, title:h.title, caption:h.city}); });
+  hotels.forEach(h => { if(!state || h.state===state) items.push({img:h.img, title:h.title, caption:h.city}); });
+  if(items.length===0) { grid.innerHTML = '<div class="muted">No photos for this state.</div>'; return; }
+  items.forEach(it => {
+    const d = document.createElement('div');
+    d.style.cursor = 'pointer';
+    const img = createImg(it.img, it.title);
+    img.onclick = ()=> openLightbox(it.img);
+    d.appendChild(img);
+    grid.appendChild(d);
+  });
+}
+function openLightbox(src){
+  document.getElementById('lightboxImg').src = src || NO_IMAGE;
+  document.getElementById('lightbox').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox(){ document.getElementById('lightbox').style.display = 'none'; document.body.style.overflow = ''; }
+
+/* -------------------------
+   AUDIO (muted autoplay then unmute on click)
+   ------------------------- */
+const audio = new Audio();
+audio.src = 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_b66a4f45bc.mp3?filename=meditation-bells-6944.mp3'; // royalty-free short ambient
+audio.loop = true;
+audio.volume = 0.25;
+audio.muted = true; // start muted to satisfy browsers
+audio.play().catch(()=>{ /* play might be blocked until interaction */ });
+
+const muteBtn = document.getElementById('muteBtn');
+function toggleMute(){
+  if(audio.muted){
+    audio.muted = false;
+    muteBtn.innerText = '🔊 Mute';
+  } else {
+    audio.muted = true;
+    muteBtn.innerText = '🔈 Unmute';
+  }
+}
+muteBtn.addEventListener('click', toggleMute);
+
+/* -------------------------
+   SMALL HELPERS
+   ------------------------- */
+function scrollToTop(){ window.scrollTo({top:0,behavior:'smooth'}); }
+
+/* -------------------------
+   INIT
+   ------------------------- */
+function init(){
+  setLang('en');
+  buildSlides();
+  startSlideshow();
+  populateAll();
+  buildGallery();
+  showSection('holy');
+}
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
